@@ -1,0 +1,20 @@
+sudo: required
+dist: trusty
+language: node_js
+node_js:
+  - 10
+before_install:
+  - npm install -g truffle ganache-cli
+install:
+  - npm install
+cache:
+  directories:
+    - node_modules
+before_script:
+  - testrpc > /dev/null &
+  - sleep 5
+script:
+  - npm run lint
+  - npm test
+after_script:
+  - npm run coverage && cat coverage/lcov.info | coveralls

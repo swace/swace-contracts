@@ -1,0 +1,8 @@
+allFiredEvents
+build
+compiled
+coverageEnv
+flattened
+node_modules
+.DS_Store
+.env
