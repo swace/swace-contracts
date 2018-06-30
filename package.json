@@ -18,9 +18,7 @@
     "smart",
     "contracts",
     "security",
-    "swace",
-    "ico",
-    "crowdsale"
+    "swace"
   ],
   "homepage": "https://swace.io",
   "eslintIgnore": [

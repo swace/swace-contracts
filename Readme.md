@@ -29,5 +29,16 @@ solidity_flattener --solc-paths="openzeppelin-solidity/=$(pwd)/node_modules/open
 solidity_flattener --solc-paths="openzeppelin-solidity/=$(pwd)/node_modules/openzeppelin-solidity/" --output=flattened/VestingAgent.sol  contracts/VestingAgent.sol
 ```
 
-### Etherscan
+## Etherscan
 Swace Token (SWA) contract address: [0x7e6509ac567e7de3bc702e7caf3b56245b50d1a7](https://etherscan.io/token/0x7e6509ac567e7de3bc702e7caf3b56245b50d1a7)
+
+## Contacts
+[Medium](https://medium.com/swace)
+[Bitcointalk](https://bitcointalk.org/index.php?topic=3675646)  
+[Twitter](https://twitter.com/swaceapp)  
+[Facebook](https://www.facebook.com/swaceapp/)  
+[Linkedin](https://www.linkedin.com/company/swace/)  
+[Telegram](http://t.me/swace)
+
+## About
+[Whitepaper](https://www.swace.io/downloads/Swace_Whitepaper.pdf)
