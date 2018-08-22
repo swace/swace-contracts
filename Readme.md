@@ -27,6 +27,7 @@ Flatten the contract
 ```
 solidity_flattener --solc-paths="openzeppelin-solidity/=$(pwd)/node_modules/openzeppelin-solidity/" --output=flattened/SwaceToken.sol  contracts/SwaceToken.sol
 solidity_flattener --solc-paths="openzeppelin-solidity/=$(pwd)/node_modules/openzeppelin-solidity/" --output=flattened/VestingAgent.sol  contracts/VestingAgent.sol
+solidity_flattener --solc-paths="openzeppelin-solidity/=$(pwd)/node_modules/openzeppelin-solidity/" --output=flattened/MultiTransferAgent.sol  contracts/MultiTransferAgent.sol
 ```
 
 ## Etherscan
