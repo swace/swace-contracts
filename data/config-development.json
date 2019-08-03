@@ -1,18 +1,8 @@
 {
   "owner": "",
-  "community": "",
-  "advisorBounty": "",
-  "team": [
-    {
-      "beneficiary": "",
-      "amount": 100000,
-      "revokable": false
-    },
-    {
-      "beneficiary": "",
-      "amount": 200000,
-      "revokable": true
-    }
+  "vestingOwner": "",
+  "ieo": "",
+  "vesting": [
   ],
   "swaceContractAddress": ""
 }

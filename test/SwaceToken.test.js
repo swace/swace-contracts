@@ -18,9 +18,8 @@ contract('SwaceToken', (accounts) => {
   const cap = new BigNumber(2700e6 * 10 ** 18);
 
   const owner = accounts[0];
-  const teamWallet = accounts[1];
-  const communityWallet = accounts[2];
-  const advisorBountyWallet = accounts[3];
+  const vestingWallet = accounts[1];
+  const ieoWallet = accounts[2];
 
   const receiver = accounts[4];
   const other = accounts[4];
@@ -35,54 +34,43 @@ contract('SwaceToken', (accounts) => {
 
   beforeEach(async () => {
     token = await SwaceToken.new(
-      communityWallet,
-      teamWallet,
-      advisorBountyWallet,
+      vestingWallet,
+      ieoWallet,
       { from: owner }
     );
   });
 
   describe('initialize', () => {
-    it('community wallet should not be the zero address', async function () {
+    it('vesting wallet should not be the zero address', async function () {
       await SwaceToken.new(
         zeroWallet,
-        teamWallet,
-        advisorBountyWallet
+        ieoWallet
       ).should.be.rejectedWith(EVMRevert);
     });
 
-    it('team wallet should not be the zero address', async () => {
+    it('IEO wallet should not be the zero address', async () => {
       await SwaceToken.new(
-        communityWallet,
-        zeroWallet,
-        advisorBountyWallet
-      ).should.be.rejectedWith(EVMRevert);
-    });
-
-    it('adivsor & bounty wallet should not be the zero address', async () => {
-      await SwaceToken.new(
-        communityWallet,
-        teamWallet,
+        vestingWallet,
         zeroWallet
       ).should.be.rejectedWith(EVMRevert);
     });
 
-    it('should have set community wallet', async () => {
-      (await token.communityWallet()).should.be.equal(communityWallet);
+    it('should have set IEO wallet', async () => {
+      (await token.ieoWallet()).should.be.equal(ieoWallet);
     });
 
     it('should have set vesting agent', async () => {
-      (await token.vestingAgent()).should.be.equal(teamWallet);
+      (await token.vestingAgent()).should.be.equal(vestingWallet);
     });
   });
 
   describe('details', function () {
-    it('should have a name', async () => {
+    it('should have Swace as a name', async () => {
       (await token.name()).should.be.equal('Swace');
     });
 
-    it('should have a symbol', async () => {
-      (await token.symbol()).should.be.equal('SWA');
+    it('should have SWACE as a symbol', async () => {
+      (await token.symbol()).should.be.equal('SWACE');
     });
 
     it('should have 18 decimals', async () => {
@@ -100,24 +88,17 @@ contract('SwaceToken', (accounts) => {
 
   describe('reserved supplies', () => {
     let _supply = new BigNumber(0);
-    it('should have correct team supply', async () => {
-      let supply = await token.TEAM_SUPPLY();
+    it('should have correct IEO supply', async () => {
+      let supply = await token.IEO_SUPPLY();
       _supply = _supply.plus(supply);
-      let balance = await token.balanceOf(teamWallet);
+      let balance = await token.balanceOf(ieoWallet);
       balance.should.be.bignumber.equal(supply);
     });
 
-    it('should have correct community supply', async () => {
-      let supply = await token.COMMUNITY_SUPPLY();
+    it('should have correct vesting supply', async () => {
+      let supply = await token.VESTING_SUPPLY();
       _supply = _supply.plus(supply);
-      let balance = await token.balanceOf(communityWallet);
-      balance.should.be.bignumber.equal(supply);
-    });
-
-    it('should have correct advisor & bounty supply', async () => {
-      let supply = await token.ADV_BTY_SUPPLY();
-      _supply = _supply.plus(supply);
-      let balance = await token.balanceOf(advisorBountyWallet);
+      let balance = await token.balanceOf(vestingWallet);
       balance.should.be.bignumber.equal(supply);
     });
 
@@ -162,51 +143,6 @@ contract('SwaceToken', (accounts) => {
       event.args.newVestingAgent.should.be.equal(newVA);
 
       (await token.vestingAgent()).should.be.equal(newVA);
-    });
-  });
-
-  describe('finalization', () => {
-    it('should only allow to finalize for owner', async () => {
-      await token.finalize({ from: other }).should.be.rejectedWith(EVMRevert);
-    });
-
-    it('should finalize', async () => {
-      let amount = 1000000;
-
-      let balanceOwnerStarting = await token.balanceOf(owner);
-      let balanceAdvBtyStarting = await token.balanceOf(advisorBountyWallet);
-      let balanceCommunityStarting = await token.balanceOf(communityWallet);
-
-      await token.approve(owner, balanceAdvBtyStarting, { from: advisorBountyWallet });
-
-      // Some transfers
-      await token.transfer(receiver, amount, { from: owner });
-
-      // The amount that left after last transfer will be passed to event
-      let balanceOwnerEvent = await token.balanceOf(owner);
-      balanceOwnerEvent = balanceOwnerEvent.plus(balanceAdvBtyStarting);
-
-      let event = await expectEvent.inTransaction(token.finalize({ from: owner }), 'Finalize');
-      event.args.value.should.bignumber.equal(balanceOwnerEvent);
-
-      let balanceOwnerEnding = await token.balanceOf(owner);
-      let balanceCommunityEnding = await token.balanceOf(communityWallet);
-
-      (await token.finalized()).should.be.equal(true);
-
-      balanceOwnerEnding.should.be.bignumber.equal(new BigNumber(0));
-      let balanceExpected = balanceCommunityStarting.plus(balanceOwnerStarting.minus(amount));
-      balanceExpected = balanceExpected.plus(balanceAdvBtyStarting);
-      balanceCommunityEnding.should.be.bignumber.equal(balanceExpected);
-
-      (await token.mintingFinished()).should.be.equal(true);
-    });
-
-    it('should finalize once', async () => {
-      let balanceAdvBtyStarting = await token.balanceOf(advisorBountyWallet);
-      await token.approve(owner, balanceAdvBtyStarting, { from: advisorBountyWallet });
-      await token.finalize({ from: owner });
-      await token.finalize({ from: owner }).should.be.rejectedWith(EVMRevert);
     });
   });
 });

@@ -21,8 +21,7 @@ contract('VestingAgent', (accounts) => {
   const startTime = latestTime();
 
   const owner = accounts[0];
-  const communityWallet = accounts[2];
-  const advisorBountyWallet = accounts[3];
+  const ieoWallet = accounts[2];
 
   const receiver = accounts[4];
   const other = accounts[4];
@@ -39,9 +38,8 @@ contract('VestingAgent', (accounts) => {
     agent = await (VestingAgent.new({ from: owner }));
 
     token = await SwaceToken.new(
-      communityWallet,
       agent.address,
-      advisorBountyWallet,
+      ieoWallet,
       { from: owner }
     );
 

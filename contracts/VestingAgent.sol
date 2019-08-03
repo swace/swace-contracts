@@ -1,14 +1,16 @@
-pragma solidity ^0.4.22;
+pragma solidity ^0.4.24;
 
 
 import "./SwaceToken.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/TokenVesting.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 
 
 contract VestingAgent is Ownable {
   using SafeMath for uint256;
+  using SafeERC20 for ERC20Basic;
 
   event NewVesting(address indexed from, address indexed to, uint256 amount);
 
@@ -59,7 +61,7 @@ contract VestingAgent is Ownable {
     require(vests[_to] == address(0));
 
     // Check that this grant doesn't exceed the total amount of tokens currently available for vesting.
-    require(totalVesting.add(_value) <= swa.balanceOf(address(this)));
+    require(_value <= swa.balanceOf(address(this)));
 
     vests[_to] = new TokenVesting(_to, _start, _cliff, _duration, _revokable);
     swa.transfer(address(vests[_to]), _value);
@@ -121,5 +123,17 @@ contract VestingAgent is Ownable {
     returns (uint256)
   {
     return swa.balanceOf(address(this)).sub(totalVesting);
+  }
+
+  /**
+   * @dev Reclaim all ERC20Basic compatible tokens
+   * @param _token ERC20Basic The address of the token contract
+   */
+  function reclaimToken(ERC20Basic _token)
+    public
+    onlyOwner
+  {
+    uint256 balance = _token.balanceOf(this);
+    _token.safeTransfer(owner, balance);
   }
 }

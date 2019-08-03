@@ -1,5 +1,5 @@
 
-# Swace token ERC20 contract (SWA)
+# Swace token ERC20 contract (SWACE)
 <p align="center">
   <img src="https://swace.io/images/swace-logo-color-white-type.svg">
 </p>
@@ -31,15 +31,15 @@ solidity_flattener --solc-paths="openzeppelin-solidity/=$(pwd)/node_modules/open
 ```
 
 ## Etherscan
-Swace Token (SWA) contract address: [0x7e6509ac567e7de3bc702e7caf3b56245b50d1a7](https://etherscan.io/token/0x7e6509ac567e7de3bc702e7caf3b56245b50d1a7)
+Swace Token (SWACE) contract address: [0x03b155af3f4459193a276395dd76e357bb472da1](https://etherscan.io/token/0x03b155af3f4459193a276395dd76e357bb472da1)
 
 ## Contacts
 [Medium](https://medium.com/swace)
-[Bitcointalk](https://bitcointalk.org/index.php?topic=3675646)  
 [Twitter](https://twitter.com/swaceapp)  
+[Telegram](http://t.me/swace)
+[Bitcointalk](https://bitcointalk.org/index.php?topic=3675646)  
 [Facebook](https://www.facebook.com/swaceapp/)  
 [Linkedin](https://www.linkedin.com/company/swace/)  
-[Telegram](http://t.me/swace)
 
 ## About
 [Whitepaper](https://www.swace.io/downloads/Swace_Whitepaper.pdf)

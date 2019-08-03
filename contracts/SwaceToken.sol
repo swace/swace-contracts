@@ -1,63 +1,48 @@
-pragma solidity ^0.4.22;
+pragma solidity ^0.4.24;
 
 
 import "openzeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/PausableToken.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/CappedToken.sol";
-import "openzeppelin-solidity/contracts/ownership/HasNoEther.sol";
-import "openzeppelin-solidity/contracts/ownership/HasNoTokens.sol";
 
 
-contract SwaceToken is DetailedERC20, PausableToken, CappedToken, HasNoTokens, HasNoEther {
-  event Finalize(uint256 value);
+contract SwaceToken is DetailedERC20, PausableToken, CappedToken {
   event ChangeVestingAgent(address indexed oldVestingAgent, address indexed newVestingAgent);
 
   uint256 private constant TOKEN_UNIT = 10 ** uint256(18);
-  uint256 public constant TOTAL_SUPPLY = 2700e6 * TOKEN_UNIT;
+  uint256 public constant TOTAL_SUPPLY = 2.7e9 * TOKEN_UNIT;
 
-  uint256 public constant COMMUNITY_SUPPLY = 621e6 * TOKEN_UNIT;
-  uint256 public constant TEAM_SUPPLY = 324e6 * TOKEN_UNIT;
-  uint256 public constant ADV_BTY_SUPPLY = 270e6 * TOKEN_UNIT;
+  uint256 public constant VESTING_SUPPLY = 5.67e8 * TOKEN_UNIT;
+  uint256 public constant IEO_SUPPLY = 1.35e8 * TOKEN_UNIT;
 
-  address public advBtyWallet;
-  address public communityWallet;
+  address public ieoWallet;
   address public vestingAgent;
 
-  bool public finalized = false;
-
   modifier onlyVestingAgent() {
-    require(msg.sender == vestingAgent);
-    _;
-  }
-
-  modifier whenNotFinalized() {
-    require(!finalized);
+    require(msg.sender == vestingAgent, "Sender not authorized to be as vesting agent");
     _;
   }
 
   constructor(
-    address _communityWallet,
-    address _teamWallet,
-    address _advBtyWallet
+    address _vestingWallet,
+    address _ieoWallet
   )
     public
-    DetailedERC20("Swace", "SWA", 18)
+    DetailedERC20("Swace", "SWACE", 18)
     CappedToken(TOTAL_SUPPLY)
   {
     // solium-disable-next-line security/no-block-members
-    require(_communityWallet != address(0));
-    require(_teamWallet != address(0));
-    require(_advBtyWallet != address(0));
+    require(_vestingWallet != address(0), "Vesting wallet can not be empty");
+    require(_ieoWallet != address(0), "IEO wallet can not be empty");
 
-    communityWallet = _communityWallet;
-    advBtyWallet = _advBtyWallet;
+    ieoWallet = _ieoWallet;
+
     //Team wallet is actually vesting agent contract
-    changeVestingAgent(_teamWallet);
+    changeVestingAgent(_vestingWallet);
 
     //Mint tokens to defined wallets
-    mint(_communityWallet, COMMUNITY_SUPPLY);
-    mint(_teamWallet, TEAM_SUPPLY);
-    mint(_advBtyWallet, ADV_BTY_SUPPLY);
+    mint(_vestingWallet, VESTING_SUPPLY);
+    mint(_ieoWallet, IEO_SUPPLY);
 
     //Mint owner with the rest of tokens
     mint(owner, TOTAL_SUPPLY.sub(totalSupply_));
@@ -77,37 +62,9 @@ contract SwaceToken is DetailedERC20, PausableToken, CappedToken, HasNoTokens, H
     returns (bool)
   {
     //https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-    require((_value == 0) || (allowed[msg.sender][_spender] == 0));
+    require((_value == 0) || (allowed[msg.sender][_spender] == 0), "Approval can not be granted");
+
     return super.approve(_spender, _value);
-  }
-
-  /**
-   * @dev Do finalization.
-   * @return A boolean that indicates if the operation was successful.
-   */
-  function finalize()
-    public
-    onlyOwner
-    whenNotFinalized
-    returns (bool)
-  {
-    uint256 ownerBalance = balanceOf(owner);
-    //Transfer what is left in owner to community wallet
-    if (ownerBalance > 0) {
-      transfer(communityWallet, ownerBalance);
-    }
-
-    uint256 advBtyBalance = balanceOf(advBtyWallet);
-    //Transfer what is left in advisor & bounty wallet to community wallet
-    //TODO: does not work probably because there is no approval
-    if (advBtyBalance > 0) {
-      transferFrom(advBtyWallet, communityWallet, advBtyBalance);
-    }
-
-    finalized = true;
-    emit Finalize(ownerBalance.add(advBtyBalance));
-
-    return true;
   }
 
   /**
